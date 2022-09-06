@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Holdim Proposal Review</title>
+</head>
+<body>
+  <h1>Proposal #<%= proposal.id %></h1>
+  <div>
+    <b>Title:</b> <%= proposal.title %>
+  </div>
+  <div>
+    <b>Senior description:</b> <%= proposal.seniorDescription %>
+  </div>
+  <div>
+    <b>Junior description:</b> <%= proposal.juniorDescription %>
+  </div>
+  <hr/>
+  <form method="POST" action="<%= route %>/accept">
+    <button>Accept</button>
+  </form>
+  <hr/>
+  <form method="POST" action="<%= route %>/edit">
+    <input type="text" id="newSeniorDescription" name="newSeniorDescription" placeholder="New senior text goes here..." style="width: 100%; height: 300px"></textarea>
+    <button>Edit</button>
+  </form>
+</body>
+</html>
