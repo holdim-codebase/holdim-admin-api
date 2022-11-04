@@ -48,7 +48,7 @@ fastify.get('/proposals/:proposalId/review', async (request, reply) => {
     return
   }
 
-  const dao = await repositories.dao.findFirst({ where: { id: proposal.id } })
+  const dao = await repositories.dao.findFirst({ where: { id: proposal.daoId } })
 
   return reply.view('/proposals.review.ejs', { proposal, route: `/proposals/${proposal.id}/review`, daoName: dao ? dao.name : 'Unknown' })
 })
