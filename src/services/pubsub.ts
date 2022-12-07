@@ -7,20 +7,26 @@ export const queueAccepted = async (proposal: DBProposal) => {
   const topic = pubsub.topic(config.pubsub.toUpdater.topicNameOrId)
   await topic.publishMessage({
     json: {
-      id: proposal.id,
-      juniorDescription: proposal.juniorDescription,
+      juniorText: proposal.juniorDescription,
+      configName: 'default',
+      metadata: {
+        id: proposal.id,
+      },
       setIssueNumber: true,
     },
   })
 }
 
-export const queueEdited = async (proposal: DBProposal, newSeniorDescription: string) => {
+export const queueEdited = async (proposal: DBProposal, newSeniorDescription: string, configName: string) => {
   const pubsub = new PubSub()
   const topic = pubsub.topic(config.pubsub.toAi.topicNameOrId)
   await topic.publishMessage({
     json: {
-      id: proposal.id,
-      seniorDescription: newSeniorDescription,
+      seniorText: newSeniorDescription,
+      configName,
+      metadata: {
+        id: proposal.id,
+      },
     },
   })
 }

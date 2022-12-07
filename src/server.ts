@@ -66,9 +66,9 @@ fastify.post('/proposals/:proposalId/review/accept', async (request, reply) => {
 })
 
 fastify.post('/proposals/:proposalId/review/edit', async (request, reply) => {
-  const { newSeniorDescription } = request.body as { newSeniorDescription?: string }
+  const { newSeniorDescription, configName } = request.body as { newSeniorDescription?: string; configName?: string }
 
-  if (!newSeniorDescription) {
+  if (!newSeniorDescription || !configName) {
     return reply.send(422).send('Unprocessable entity')
   }
 
@@ -78,7 +78,7 @@ fastify.post('/proposals/:proposalId/review/edit', async (request, reply) => {
     return
   }
 
-  await queueEdited(proposal, newSeniorDescription)
+  await queueEdited(proposal, newSeniorDescription, configName)
 
   return reply.send('New senior description was sent for AI generation')
 })

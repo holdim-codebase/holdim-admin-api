@@ -26,7 +26,22 @@
   </form>
   <hr/>
   <form method="POST" action="<%= route %>/edit">
-    <input type="text" id="newSeniorDescription" name="newSeniorDescription" placeholder="New senior text goes here..." style="width: 100%; height: 300px"></textarea>
+    <input
+      type="text"
+      id="newSeniorDescription"
+      name="newSeniorDescription"
+      placeholder="New senior text goes here..."
+      style="width: 100%; height: 300px" />
+    <select
+      name="configName"
+      id="configName"
+    >
+      <option value="default">Default</option>
+      <option value="ETS">ETS</option>
+      <option value="TLDR">TLDR</option>
+      <option value="terms">Terms</option>
+      <option value="empty">Empty</option>
+    </select>
     <button>Edit</button>
   </form>
 </body>
