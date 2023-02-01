@@ -8,7 +8,6 @@
     "module": "CommonJS",
     "lib": ["ES2019", "DOM"],
     "allowJs": false,
-    "incremental": true,
     "esModuleInterop": true,
     "sourceMap": true,
     "rootDir": "src",

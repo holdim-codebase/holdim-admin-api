@@ -1,16 +1,21 @@
-
-import fastifyFactory, { FastifyRequest, FastifyReply } from 'fastify'
+import fastifyFactory from 'fastify'
 import fastifyView from '@fastify/view'
 import fastifyFormBody from '@fastify/formbody'
+import fastifyBasicAuth from '@fastify/basic-auth'
+import cors from '@fastify/cors'
 import ejs from 'ejs'
 import path from 'path'
-import { Proposal as DBProposal } from '@prisma/client'
-import { queueAccepted, queueEdited } from './services/pubsub'
-import { repositories } from './repositories'
+
+import { QuickLookController } from './routes/QuickLookController'
+import { AdminPanelController } from './routes/AdminPanelController'
+
 import { logger } from './logging'
 
 export const fastify = fastifyFactory({ logger })
 
+void fastify.register(cors, {
+  exposedHeaders: ['X-Total-Count'],
+})
 void fastify.register(fastifyView, {
   engine: {
     ejs,
@@ -19,68 +24,19 @@ void fastify.register(fastifyView, {
 })
 void fastify.register(fastifyFormBody)
 
-const fetchAndValidateProposal = async (request: FastifyRequest, reply: FastifyReply): Promise<DBProposal | null> => {
-  const { proposalId } = request.params as { proposalId: string }
+// Controller: Quick Look (Telegram Bot)
+void fastify.register(QuickLookController)
 
-  const proposal = await repositories.proposal.findFirst({
-    where: {
-      id: Number(proposalId),
-    },
-  })
-
-  if (!proposal) {
-    await reply.status(404).send('Proposal not found')
-    return null
-  }
-
-  if (proposal.issueNumber !== null) {
-    await reply.status(403).send('Proposal was already accepted')
-    return null
-  }
-
-  return proposal
-}
-
-fastify.get('/proposals/:proposalId/review', async (request, reply) => {
-  const proposal = await fetchAndValidateProposal(request, reply)
-
-  if (proposal === null) {
-    return
-  }
-
-  const dao = await repositories.dao.findFirst({ where: { id: proposal.daoId } })
-
-  return reply.view('/proposals.review.ejs', { proposal, route: `/proposals/${proposal.id}/review`, daoName: dao ? dao.name : 'Unknown' })
+// Basic Auth
+void fastify.register(fastifyBasicAuth, {
+  validate: async (username, password) => {
+    if (username !== 'admin' || password !== 'loh') {
+      return new Error('Not authorized')
+    }
+  },
 })
 
-fastify.post('/proposals/:proposalId/review/accept', async (request, reply) => {
-  const proposal = await fetchAndValidateProposal(request, reply)
-
-  if (proposal === null) {
-    return
-  }
-
-  await queueAccepted(proposal)
-
-  return reply.send('Junior description was accepted and will appear in the app shortly')
-})
-
-fastify.post('/proposals/:proposalId/review/edit', async (request, reply) => {
-  const { newSeniorDescription, configName } = request.body as { newSeniorDescription?: string; configName?: string }
-
-  if (!newSeniorDescription || !configName) {
-    return reply.send(422).send('Unprocessable entity')
-  }
-
-  const proposal = await fetchAndValidateProposal(request, reply)
-
-  if (proposal === null) {
-    return
-  }
-
-  await queueEdited(proposal, newSeniorDescription, configName)
-
-  return reply.send('New senior description was sent for AI generation')
-})
+// Controller: Admin Dashboard API
+void fastify.register(AdminPanelController, { prefix: '/v1' })
 
 export const server = fastify
