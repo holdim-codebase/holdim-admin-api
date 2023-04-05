@@ -1,5 +1,8 @@
 import { FastifyInstance, FastifyRequest, FastifyReply } from 'fastify'
-import { Dao as DBDao } from '@prisma/client'
+import {
+  Dao as DBDao,
+  Token as DBToken,
+} from '@prisma/client'
 
 import { repositories } from '../repositories'
 
@@ -62,6 +65,74 @@ export const AdminPanelController = async (fastify: FastifyInstance) => {
     })
 
     return reply.status(202).send(dao)
+  })
+
+  // Tokens
+  fastify.get('/tokens', async (request: FastifyRequest, reply: FastifyReply) => {
+    let { sort, range } = request.query as { sort: string, range: string }
+
+    if (!sort) { sort = '["id", "desc"]' }
+    if (!range) { range = '[0, 10]' }
+
+    const [field, order] = JSON.parse(sort)
+    const [skip, take] = JSON.parse(range)
+
+    const [count, tokens] = await repositories.$transaction([
+      repositories.token.count(),
+      repositories.token.findMany({
+        skip,
+        take,
+        orderBy: { [field]: order.toLowerCase() },
+      }),
+    ])
+
+    return reply
+      .header('X-Total-Count', count)
+      .send(tokens)
+  })
+
+  fastify.get('/tokens/:id', async (request: FastifyRequest, reply: FastifyReply) => {
+    const { id } = request.params as { id: string }
+
+    const token = await repositories.token.findFirst({
+      where: { id },
+    })
+
+    if (!token) {
+      return reply.status(404).send()
+    }
+
+    return token
+  })
+
+  fastify.post('/tokens', async (request: FastifyRequest, reply: FastifyReply) => {
+    const data = request.body as DBToken
+
+    const token = await repositories.token.create({ data })
+
+    return reply.status(201).send(token)
+  })
+
+  fastify.put('/tokens/:id', async (request: FastifyRequest, reply: FastifyReply) => {
+    const { id } = request.params as { id: string }
+    const data = request.body as DBToken
+
+    const token = await repositories.token.update({
+      data,
+      where: { id },
+    })
+
+    return reply.status(202).send(token)
+  })
+
+  fastify.delete('/tokens/:id', async (request: FastifyRequest, reply: FastifyReply) => {
+    const { id } = request.params as { id: string }
+
+    await repositories.token.delete({
+      where: { id },
+    })
+
+    return reply.status(201)
   })
 
   // Proposals
