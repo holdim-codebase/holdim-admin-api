@@ -1,7 +1,6 @@
 // This is your Prisma schema file,
 // learn more about it in the docs: https://pris.ly/d/prisma-schema
 
-
 generator client {
   provider = "prisma-client-js"
 }
@@ -14,11 +13,11 @@ datasource db {
 model User {
   id String @id @db.VarChar(255)
 
-  createdAt     DateTime        @default(now())
-  proposals     Proposal[]
-  Daos          Dao[]
-  UserDaoFollow UserDaoFollow[]
-  Wallet        Wallet[]
+  createdAt    DateTime       @default(now())
+  proposals    Proposal[]
+  Daos         Dao[]
+  Wallet       Wallet[]
+  UserDaoEmoji UserProposalEmoji[]
 }
 
 model Wallet {
@@ -27,7 +26,10 @@ model Wallet {
   address String
   ens     String? @db.VarChar(255)
 
-  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  user            User              @relation(fields: [userId], references: [id], onDelete: Cascade)
+  WalletDaoFollow WalletDaoFollow[]
+
+  @@unique([userId, address])
 }
 
 model Dao {
@@ -38,11 +40,11 @@ model Dao {
   overview      String
   tokenOverview String
 
-  createdAt     DateTime        @default(now())
-  Proposal      Proposal[]
-  Token         Token[]
-  users         User[]
-  UserDaoFollow UserDaoFollow[]
+  createdAt       DateTime          @default(now())
+  Proposal        Proposal[]
+  Token           Token[]
+  users           User[]
+  WalletDaoFollow WalletDaoFollow[]
 }
 
 model Proposal {
@@ -64,6 +66,7 @@ model Proposal {
   dao       Dao      @relation(fields: [daoId], references: [id], onDelete: Cascade)
   User      User?    @relation(fields: [userId], references: [id])
   userId    String?  @db.VarChar(255)
+  UserProposalEmoji    UserProposalEmoji[]
 }
 
 model Token {
@@ -76,12 +79,31 @@ model Token {
   createdAt DateTime @default(now())
 }
 
-model UserDaoFollow {
-  dao    Dao    @relation(fields: [daoId], references: [id], onDelete: Cascade)
-  daoId  Int
-  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
-  userId String
+model WalletDaoFollow {
+  dao      Dao    @relation(fields: [daoId], references: [id], onDelete: Cascade)
+  daoId    Int
+  wallet   Wallet @relation(fields: [walletId], references: [id], onDelete: Cascade)
+  walletId Int
 
   createdAt DateTime @default(now())
-  @@id([daoId, userId])
+  @@id([daoId, walletId])
+}
+
+model Emoji {
+  id           Int            @id @default(autoincrement())
+  url          String @unique
+  unicode      String
+  UserDaoEmoji UserProposalEmoji[]
+}
+
+model UserProposalEmoji {
+  proposal     Proposal    @relation(fields: [proposalId], references: [id], onDelete: Cascade)
+  proposalId   Int
+  user    User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId  String
+  emojiId Int
+  emoji   Emoji  @relation(fields: [emojiId], references: [id])
+
+  createdAt DateTime @default(now())
+  @@id([proposalId, userId])
 }
