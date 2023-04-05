@@ -1,5 +1,14 @@
 # Holdim Admin API
 
+## Clone
+
+1. Clone repository
+2. Clone submodules
+
+```
+git submodule update --init --recursive
+```
+
 ## Installation
 
 1. Install Docker on your system
