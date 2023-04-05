@@ -1,6 +1,6 @@
 /* eslint-disable no-useless-escape */
-import { repositories } from '../src/repositories'
 import { omit } from 'lodash'
+import { repositories } from '../src/repositories'
 
 const dao = {
   aave: {

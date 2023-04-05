@@ -1,16 +1,18 @@
-<div align="center">
+# Holdim Admin API
 
-# MNTND
+## Installation
 
-</div>
+1. Install Docker on your system
 
-## 🚀 Quick-start
+2. Build containers
 
-- `yarn`
-- `yarn build`
-- `yarn start`
-- Visit [`http://localhost:3000/`](http://localhost:3000/)
+```
+cd docker-compose
+docker-compose up
+```
 
-## ⚖️ License
+3. Run seed
 
-This project is published under [MIT license](./LICENSE).
+```
+docker exec -it holdim_admin_api yarn db:seed
+```

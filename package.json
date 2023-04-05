@@ -6,12 +6,17 @@
   "author": "Ali Nuraldin",
   "license": "MIT",
   "private": true,
+  "prisma": {
+    "schema": "prisma/schema.prisma",
+    "seed": "ts-node prisma/seed.ts"
+  },
   "scripts": {
     "test": "mocha -r ts-node/register 'tests/**/*.ts'",
     "clean": "rm -rf dist",
     "build": "yarn clean && prisma generate && tsc && cp -r src/templates dist",
     "start": "prisma migrate deploy && node ./dist/index.js",
-    "lint": "eslint './**/*.ts' -f codeframe"
+    "lint": "eslint './**/*.ts' -f codeframe",
+    "db:seed": "npx prisma db seed"
   },
   "dependencies": {
     "@fastify/basic-auth": "^5.0.0",
@@ -33,6 +38,7 @@
     "prisma": "^4.10.1"
   },
   "devDependencies": {
+    "@types/lodash": "^4.14.192",
     "@typescript-eslint/eslint-plugin": "5.27.0",
     "@typescript-eslint/parser": "5.27.0",
     "eslint": "^7.32.0",

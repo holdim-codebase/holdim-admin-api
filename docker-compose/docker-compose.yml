@@ -1,14 +1,5 @@
 version: '3.8'
 services:
-  api:
-    build:
-      context: '..'
-      dockerfile: 'Dockerfile'
-    networks:
-      - webproxy
-    env_file: .env
-    ports:
-      - '8080:8080'
   sql:
     image: 'postgres:14'
     networks:
@@ -17,6 +8,18 @@ services:
       - .env
     ports:
       - 5432:5432
+  api:
+    build:
+      context: '..'
+      dockerfile: 'Dockerfile'
+    container_name: holdim_admin_api
+    networks:
+      - webproxy
+    env_file: .env
+    ports:
+      - '8080:8080'
+    depends_on:
+      - sql
 networks:
   webproxy:
     driver: bridge
