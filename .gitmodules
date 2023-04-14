@@ -1,0 +1,3 @@
+[submodule "prisma"]
+	path = prisma
+	url = git@github.com:holdim-codebase/holdim-prisma-main-database.git

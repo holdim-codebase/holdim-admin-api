@@ -1,16 +1,27 @@
-<div align="center">
+# Holdim Admin API
 
-# MNTND
+## Clone
 
-</div>
+1. Clone repository
+2. Clone submodules
 
-## 🚀 Quick-start
+```
+git submodule update --init --recursive
+```
 
-- `yarn`
-- `yarn build`
-- `yarn start`
-- Visit [`http://localhost:3000/`](http://localhost:3000/)
+## Installation
 
-## ⚖️ License
+1. Install Docker on your system
 
-This project is published under [MIT license](./LICENSE).
+2. Build containers
+
+```
+cd docker-compose
+docker-compose up
+```
+
+3. Run seed
+
+```
+docker exec -it holdim_admin_api yarn db:seed
+```
